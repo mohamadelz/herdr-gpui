@@ -322,7 +322,7 @@ impl SettingsWindow {
             ))
             .child(div().min_w_0().child(status));
         for (index, (label, _)) in FIELDS.iter().enumerate() {
-            engine = engine.child(self.cloud_field(label, card.fields[index].clone().into()));
+            engine = engine.child(self.cloud_field(*label, card.fields[index].clone().into()));
         }
         engine = engine.child(
             div().flex().justify_end().child(

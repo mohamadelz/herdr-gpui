@@ -373,7 +373,7 @@ impl SettingsWindow {
                     }),
             );
         for (index, (label, _)) in FIELDS.iter().enumerate() {
-            card = card.child(self.cloud_field(label, cloud.fields[index].clone().into()));
+            card = card.child(self.cloud_field(*label, cloud.fields[index].clone().into()));
             if index == 1 {
                 card = card
                     .child(self.cloud_field("OAuth client secret", cloud.secret.clone().into()))

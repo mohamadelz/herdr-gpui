@@ -331,7 +331,7 @@ impl SettingsWindow {
             ))
             .child(div().min_w_0().child(status));
         for (index, (label, _)) in FIELDS.iter().enumerate() {
-            account = account.child(self.cloud_field(label, card.fields[index].clone().into()));
+            account = account.child(self.cloud_field(*label, card.fields[index].clone().into()));
             if index == 0 {
                 account = account
                     .child(self.cloud_field("API key", card.key.clone().into()))

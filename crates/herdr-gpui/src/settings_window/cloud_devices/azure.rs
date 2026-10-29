@@ -574,7 +574,7 @@ impl SettingsWindow {
                     .enumerate()
                     .filter(|(index, _)| *index != VM_SIZE)
                     .map(|(index, (label, _))| {
-                        self.cloud_field(label, card.fields[index].clone().into())
+                        self.cloud_field(*label, card.fields[index].clone().into())
                     }),
             )
             .child(self.cloud_field("Client ID", card.client_id.clone().into()))
