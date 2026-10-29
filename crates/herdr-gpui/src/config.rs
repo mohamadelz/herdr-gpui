@@ -289,6 +289,8 @@ pub struct Config {
     pub tab_layout: TabLayoutMode,
     pub tabs: FontConfig,
     pub terminal: FontConfig,
+    /// Rows holding right-to-left text are drawn in visual order.
+    pub terminal_bidi: bool,
     /// Blank space around every terminal's cells.
     pub terminal_padding: Padding,
     pub theme: String,
@@ -458,6 +460,7 @@ impl Default for Config {
             // sidebar and terminal use, as they do in the reference UI.
             tabs: font(monospace, 12.0),
             terminal: font(monospace, 14.0),
+            terminal_bidi: false,
             terminal_padding: Padding::default(),
             theme: "Default".into(),
             ui: font(ui, 12.0),
@@ -823,6 +826,7 @@ impl Config {
         config.sound = settings.sound;
         config.updates = settings.updates;
         config.sidebar_layout = base.sidebar_layout.clone();
+        config.terminal_bidi = settings.terminal.take_bidi()?;
         let (padding_x, padding_y) = settings.terminal.take_padding();
         config.terminal_padding = Padding::resolve(
             padding_x.as_ref(),

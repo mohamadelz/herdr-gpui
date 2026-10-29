@@ -2,6 +2,9 @@ use super::*;
 use core::prelude::v1::test;
 
 mod backdrop;
+mod bidi;
+mod bidi_columns;
+mod bidi_perf;
 mod cells;
 mod composition;
 mod diagnostics;

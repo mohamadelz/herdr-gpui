@@ -1417,6 +1417,15 @@ padding_y = [4, 8]   # top, then bottom
 
 `[layout] sidebar_gap` is deprecated. It padded only the left side of the terminal beside the sidebar. A file that still sets it keeps loading: while `padding_x` is unset, the gap becomes the left padding of every terminal, and the app reports the key as deprecated. Setting the horizontal padding in Settings writes `padding_x` and removes `sidebar_gap`.
 
+`[terminal] bidi = true` draws Arabic and Hebrew right to left, with joined letters. It is off by default.
+
+- Herdr keeps each row in logical order. With `bidi` on, each pane row that holds a strong right-to-left character is reordered by the Unicode Bidirectional Algorithm at a left-to-right paragraph level, as Terminal.app and WezTerm do. Rows without right-to-left text paint as before.
+- Each right-to-left run is shaped as one line, so the font joins its letters. When a style segment of the run shapes exactly as wide as its cells (a monospace Arabic face whose advance is the cell width), its glyphs keep the font's own positions, ligatures and joins included. Otherwise, as with a proportional fallback such as Geeza Pro or a monospace face of another width such as Kawkab Mono beside JetBrains Mono, each glyph is placed in the grid cell of its character: a ligature over several cells, such as lam-alef, sits in the leftmost, and the cells it leaves empty take a tatweel when it joins the letter on its right. Numbers inside a run keep their left-to-right order. Backgrounds, box graphics, underlines, and wide cells follow the reordered columns.
+- The cursor, the copy-mode cursor, the selection, search matches, link underlines, and the input method's composition are drawn at the visual column of their cells. A selection that crosses a change of direction is drawn as several pieces.
+- A click, a drag, a link click, and the mouse reports a program receives use the cell drawn under the pointer, translated back to the program's (logical) column. Copied text stays in logical order, as the program wrote it.
+- A cursor past the end of the text, where no cell is reordered, stays in its own column.
+- Letters in different styles (bold, italic) are shaped apart and do not join across the change. Lines keep a left-to-right base direction, so an Arabic line starts at the left edge rather than the right.
+
 Any space smaller than one character cell at the right or bottom edge takes the adjacent terminal cells' background colors, without stretching text or changing input coordinates.
 
 The `[clipboard_toast]` table controls the `copied to clipboard` flash shown

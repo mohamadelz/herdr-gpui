@@ -6,8 +6,8 @@ use super::HerdrWindow;
 use crate::{
     connection::ConnectionBridge,
     terminal::{
-        InputTarget, WheelAccumulator, cursor_offset, key_input, pane_key_input, wheel_rows,
-        wheel_target,
+        InputTarget, WheelAccumulator, cursor_offset, key_input, pane_key_input, popup_origin,
+        wheel_rows, wheel_target,
     },
 };
 use gpui::{
@@ -159,7 +159,49 @@ impl HerdrWindow {
             held = pane.contains(&grid);
             grid.y = grid.y.clamp(pane.top(), pane.bottom() - px(1.));
         }
-        ((f32::from(grid.x), f32::from(grid.y)), held)
+        let x = self.logical_x(f32::from(grid.x), f32::from(grid.y));
+        ((x, f32::from(grid.y)), held)
+    }
+
+    /// Grid pixel `x` on the row at `y` in the program's logical columns.
+    /// With `[terminal] bidi`, a right-to-left row is drawn in visual order,
+    /// so the cell under the pointer is not the one at its column. Everything
+    /// that reads a cell from the pointer (selection, links, and the mouse
+    /// reports a program reads) takes the logical one.
+    pub(crate) fn logical_x(&self, x: f32, y: f32) -> f32 {
+        let (cell_width, cell_height) = (self.cell_width, self.config.terminal.line_height());
+        let Some(surface) = self
+            .live
+            .surface
+            .as_deref()
+            .filter(|_| self.config.terminal_bidi && cell_width > 0. && cell_height > 0.)
+        else {
+            return x;
+        };
+        let popup = surface.popup.as_ref().map(|popup| {
+            let origin = popup_origin(&surface.frame, &popup.frame, cell_width, cell_height);
+            (&popup.frame, f32::from(origin.x), f32::from(origin.y))
+        });
+        let (frame, panes, left, top) = match popup {
+            Some((frame, left, top))
+                if (left..left + f32::from(frame.width) * cell_width).contains(&x)
+                    && (top..top + f32::from(frame.height) * cell_height).contains(&y) =>
+            {
+                (frame, &[][..], left, top)
+            }
+            _ => (&surface.frame, &surface.panes[..], 0., 0.),
+        };
+        let row = ((y - top) / cell_height).floor();
+        if !(0. ..f32::from(frame.height)).contains(&row) {
+            return x;
+        }
+        let column = self.painter.borrow_mut().logical_position(
+            frame,
+            panes,
+            row as u16,
+            (x - left) / cell_width,
+        );
+        left + column * cell_width
     }
 
     /// `position` in the terminal grid's pixels, for clicks and selection.
@@ -234,8 +276,8 @@ impl HerdrWindow {
         ) else {
             return;
         };
-        let x = (event.position.x - self.bounds.origin.x).to_f64() as f32;
         let y = (event.position.y - self.bounds.origin.y).to_f64() as f32;
+        let x = self.logical_x((event.position.x - self.bounds.origin.x).to_f64() as f32, y);
         let cell_height = self.config.terminal.line_height();
         let Some(target) = wheel_target(surface, x, y, self.cell_width, cell_height) else {
             self.wheel = WheelAccumulator::default();

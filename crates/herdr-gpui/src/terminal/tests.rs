@@ -259,20 +259,33 @@ fn wheel_hits_inner_pane_and_uses_relative_coordinates_and_semantic_modes() {
     surface.popup.as_mut().unwrap().frame.cursor = Some(cursor);
     // A hidden popup cursor still anchors IME; never use the base cursor.
     assert_eq!(
-        input_cursor_bounds(Some(&surface), origin, 8.5, CELL_HEIGHT),
+        input_cursor_bounds(
+            Some(&surface),
+            origin,
+            8.5,
+            CELL_HEIGHT,
+            |_, _, _, column| column
+        ),
         Bounds::new(origin + point(px(272.), px(200.)), size(px(8.5), px(20.)))
     );
     assert_eq!(
-        input_cursor_bounds(Some(&surface), origin, 8.5, 30.5),
+        input_cursor_bounds(Some(&surface), origin, 8.5, 30.5, |_, _, _, column| column),
         Bounds::new(origin + point(px(272.), px(305.)), size(px(8.5), px(30.5)))
     );
     surface.popup.as_mut().unwrap().frame.cursor = None;
     assert_eq!(
-        input_cursor_bounds(Some(&surface), origin, 8.5, CELL_HEIGHT).origin,
+        input_cursor_bounds(
+            Some(&surface),
+            origin,
+            8.5,
+            CELL_HEIGHT,
+            |_, _, _, column| column
+        )
+        .origin,
         origin + point(px(255.), px(140.))
     );
     assert_eq!(
-        input_cursor_bounds(Some(&surface), origin, 8.5, 30.5).origin,
+        input_cursor_bounds(Some(&surface), origin, 8.5, 30.5, |_, _, _, column| column).origin,
         origin + point(px(255.), px(213.5))
     );
     let grid = Bounds::new(origin, size(px(680.), px(480.)));
@@ -285,25 +298,39 @@ fn wheel_hits_inner_pane_and_uses_relative_coordinates_and_semantic_modes() {
     assert_eq!(input_area(Some(&surface), grid, 8.5, CELL_HEIGHT), grid);
     assert_eq!(input_area(None, grid, 8.5, CELL_HEIGHT), grid);
     assert_eq!(
-        input_cursor_bounds(Some(&surface), origin, 8.5, CELL_HEIGHT).origin,
+        input_cursor_bounds(
+            Some(&surface),
+            origin,
+            8.5,
+            CELL_HEIGHT,
+            |_, _, _, column| column
+        )
+        .origin,
         origin + point(px(595.), px(400.))
     );
     assert_eq!(
-        input_cursor_bounds(Some(&surface), origin, 8.5, 30.5).origin,
+        input_cursor_bounds(Some(&surface), origin, 8.5, 30.5, |_, _, _, column| column).origin,
         origin + point(px(595.), px(610.))
     );
     surface.frame.cursor = None;
     assert_eq!(
-        input_cursor_bounds(Some(&surface), origin, 8.5, CELL_HEIGHT).origin,
+        input_cursor_bounds(
+            Some(&surface),
+            origin,
+            8.5,
+            CELL_HEIGHT,
+            |_, _, _, column| column
+        )
+        .origin,
         origin
     );
     assert_eq!(
-        input_cursor_bounds(None, origin, 8.5, CELL_HEIGHT).origin,
+        input_cursor_bounds(None, origin, 8.5, CELL_HEIGHT, |_, _, _, column| column).origin,
         origin
     );
     for surface in [Some(&surface), None] {
         assert_eq!(
-            input_cursor_bounds(surface, origin, 8.5, 30.5),
+            input_cursor_bounds(surface, origin, 8.5, 30.5, |_, _, _, column| column),
             Bounds::new(origin, size(px(8.5), px(30.5)))
         );
     }

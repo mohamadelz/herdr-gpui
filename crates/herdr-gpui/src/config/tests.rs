@@ -53,6 +53,7 @@ mod status_bar_gpu;
 mod status_icons;
 mod system_themes;
 mod tab_layout;
+mod terminal_bidi;
 mod terminal_padding;
 mod theme_files;
 mod themes;

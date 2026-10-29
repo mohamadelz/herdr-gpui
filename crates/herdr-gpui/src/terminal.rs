@@ -59,22 +59,30 @@ pub(crate) fn cursor_offset(
     )
 }
 
+/// The cell the input cursor is drawn in. `visual` gives where a frame,
+/// painted with its panes, draws the logical cell at a row and column, which
+/// differs from the cursor's own column only on a reordered right-to-left row.
 pub(crate) fn input_cursor_bounds(
     surface: Option<&PaneSurfaceFrame>,
     origin: Point<Pixels>,
     cell_width: f32,
     cell_height: f32,
+    visual: impl FnOnce(&FrameData, &[PaneSurfacePane], u16, u16) -> u16,
 ) -> Bounds<Pixels> {
     let mut origin = origin;
     if let Some(surface) = surface {
-        let frame = if let Some(popup) = &surface.popup {
+        let (frame, panes) = if let Some(popup) = &surface.popup {
             origin += popup_origin(&surface.frame, &popup.frame, cell_width, cell_height);
-            &popup.frame
+            (&popup.frame, &[][..])
         } else {
-            &surface.frame
+            (&surface.frame, &surface.panes[..])
         };
         if let Some(cursor) = &frame.cursor {
-            origin += cursor_offset(cursor, cell_width, cell_height);
+            let cursor = CursorState {
+                x: visual(frame, panes, cursor.y, cursor.x),
+                ..cursor.clone()
+            };
+            origin += cursor_offset(&cursor, cell_width, cell_height);
         }
     }
     Bounds::new(origin, size(px(cell_width), px(cell_height)))

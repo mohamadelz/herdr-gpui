@@ -56,6 +56,10 @@ pub(super) const MAX_FONT_FALLBACKS: usize = 8;
 #[derive(Default, Deserialize)]
 #[serde(default)]
 pub(super) struct FontSettings {
+    /// The terminal's right-to-left reordering rather than part of its font,
+    /// read through [`Self::take_bidi`]. Untyped for the same reason as
+    /// `line_height`.
+    bidi: Option<toml::Value>,
     family: Option<String>,
     size: Option<f32>,
     fallback: Option<Vec<String>>,
@@ -75,6 +79,7 @@ impl FontSettings {
     /// cells, returning each one present to report as unknown.
     pub(super) fn reject_terminal_keys(&mut self, name: &str) -> Vec<String> {
         [
+            ("bidi", self.bidi.take()),
             ("line_height", self.line_height.take()),
             ("weight", self.weight.take()),
             ("padding_x", self.padding_x.take()),
@@ -83,6 +88,15 @@ impl FontSettings {
         .into_iter()
         .filter_map(|(key, value)| value.map(|_| format!("{name}.{key}")))
         .collect()
+    }
+
+    /// Takes the terminal table's `bidi` switch: off unless set to `true`.
+    pub(super) fn take_bidi(&mut self) -> Result<bool> {
+        match self.bidi.take() {
+            None => Ok(false),
+            Some(toml::Value::Boolean(on)) => Ok(on),
+            Some(_) => Err(Error::InvalidTerminalBidi.into()),
+        }
     }
 
     /// Takes the horizontal and vertical padding keys of the terminal's table.

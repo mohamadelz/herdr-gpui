@@ -308,6 +308,7 @@ impl HerdrWindow {
             f32::from(bounds.top()),
             f32::from(bounds.bottom()).next_down(),
         );
+        let x = self.logical_x(x, y);
         let hit = wheel_target(
             self.live.surface.as_deref()?,
             x,

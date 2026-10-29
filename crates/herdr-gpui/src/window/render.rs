@@ -119,6 +119,9 @@ impl Render for HerdrWindow {
             cell_height,
             self.terminal_theme().clone(),
         );
+        self.painter
+            .borrow_mut()
+            .set_bidi(self.config.terminal_bidi);
         self.cell_width = self.painter.borrow_mut().cell_width(&font, window, cx);
         // Registers the window for surface-only redraws; see `redraw_terminal`.
         self.surface_signal.read(cx);
@@ -566,8 +569,9 @@ impl Render for HerdrWindow {
                                         painter.borrow_mut().release_idle_images(window);
                                     }
                                     let paint_link = |window: &mut Window, shift| {
-                                        painter.borrow().paint_link(
+                                        painter.borrow_mut().paint_link(
                                             &surface.frame,
+                                            &surface.panes,
                                             bounds.origin + point(px(0.), shift),
                                             cell_width,
                                             &link_rows,
@@ -622,6 +626,11 @@ impl Render for HerdrWindow {
                                             bounds.origin,
                                             cell_width,
                                             cell_height,
+                                            |frame, panes, row, column| {
+                                                painter
+                                                    .borrow_mut()
+                                                    .visual_column(frame, panes, row, column)
+                                            },
                                         )
                                         .origin
                                             + point(px(0.), *shift),

@@ -4,6 +4,7 @@ use herdr_client::protocol::{
     CellData, ClientShellPopupSurface, FrameData, PaneSurfacePane, SurfaceRect,
 };
 
+mod bidi_copy;
 mod content_range;
 mod select_all;
 

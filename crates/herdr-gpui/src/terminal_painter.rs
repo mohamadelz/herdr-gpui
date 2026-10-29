@@ -1,17 +1,18 @@
 mod area;
+mod bidi;
 mod decorations;
 mod glyphs;
 mod graphics;
 mod grid;
 mod images;
+mod link;
 
 use self::area::whole;
 pub(crate) use self::area::{Layer, Part, Span, cell_ranges, clip, covers};
 #[cfg(test)]
 use self::decorations::decoration_offsets;
 pub(crate) use self::decorations::decoration_spans;
-use self::decorations::underline_offset;
-use self::glyphs::GlyphCache;
+use self::glyphs::{GlyphCache, paint_glyphs};
 pub(crate) use self::graphics::CellSeparator;
 use self::graphics::Graphic;
 pub(crate) use self::grid::Ground;
@@ -19,6 +20,8 @@ use self::grid::{background_extent, grid_corners, grid_rect, last_row_has_separa
 use self::images::{ImageCache, ImageGeometry, below_text};
 pub(crate) use self::images::{ImageTarget, PlacedImages};
 pub(crate) use self::images::{fit_bgra, texture};
+#[cfg(test)]
+use self::link::link_bounds;
 use crate::config::Theme;
 use crate::terminal::*;
 use gpui::*;
@@ -123,6 +126,9 @@ impl PaintDiagnostics {
 }
 
 pub(crate) struct TerminalPainter {
+    /// Right-to-left rows are drawn in visual order (`[terminal] bidi`).
+    bidi: bool,
+    bidi_cache: bidi::Cache,
     font_size: f32,
     cell_height: f32,
     theme: Theme,
@@ -145,6 +151,8 @@ pub(crate) struct TerminalPainter {
 impl Default for TerminalPainter {
     fn default() -> Self {
         Self {
+            bidi: false,
+            bidi_cache: bidi::Cache::default(),
             font_size: FONT_SIZE,
             cell_height: CELL_HEIGHT,
             theme: Theme::default(),
@@ -161,65 +169,6 @@ impl Default for TerminalPainter {
             uncached: false,
         }
     }
-}
-
-/// The cell rectangle covering every in-frame cell of `rows`, if any.
-fn link_bounds(frame: &FrameData, rows: &[(u16, std::ops::Range<u16>)]) -> Option<SurfaceRect> {
-    let mut cells = rows.iter().filter_map(|(row, columns)| {
-        let end = columns.end.min(frame.width);
-        (*row < frame.height && columns.start < end).then_some((*row, columns.start, end))
-    });
-    let (row, start, end) = cells.next()?;
-    let (top, bottom, left, right) = cells.fold(
-        (row, row, start, end),
-        |(top, bottom, left, right), (row, start, end)| {
-            (
-                top.min(row),
-                bottom.max(row),
-                left.min(start),
-                right.max(end),
-            )
-        },
-    );
-    Some(SurfaceRect {
-        x: left,
-        y: top,
-        width: right - left,
-        height: bottom - top + 1,
-    })
-}
-
-/// `ShapedLine::paint` without its per-call layer, whose BoundsTree insert
-/// would otherwise run once per cell. Glyph placement matches GPUI's.
-fn paint_glyphs(
-    line: &ShapedLine,
-    origin: Point<Pixels>,
-    line_height: Pixels,
-    color: Rgba,
-    window: &mut Window,
-) -> Result<()> {
-    let baseline = origin
-        + point(
-            px(0.),
-            (line_height - line.ascent - line.descent) / 2. + line.ascent,
-        );
-    for run in &line.runs {
-        for glyph in &run.glyphs {
-            let position = baseline + point(glyph.position.x, px(0.));
-            if glyph.is_emoji {
-                window.paint_emoji(position, run.font_id, glyph.id, line.font_size)?;
-            } else {
-                window.paint_glyph(
-                    position,
-                    run.font_id,
-                    glyph.id,
-                    line.font_size,
-                    color.into(),
-                )?;
-            }
-        }
-    }
-    Ok(())
 }
 
 /// Runs of one background in `columns`: start, end, color, and whether it is
@@ -299,6 +248,10 @@ impl TerminalPainter {
             self.glyphs.clear();
             self.cell_width = None;
         }
+    }
+
+    pub fn set_bidi(&mut self, bidi: bool) {
+        self.bidi = bidi;
     }
 
     #[cfg(feature = "integration-test")]
@@ -382,58 +335,6 @@ impl TerminalPainter {
         width
     }
 
-    /// Underlines the cells of a hovered link, painted after `paint_frame`
-    /// for the same frame and origin. Each cell takes its own text color, as
-    /// an SGR underline would, and spaces along the link are underlined too.
-    pub fn paint_link(
-        &self,
-        frame: &FrameData,
-        origin: Point<Pixels>,
-        cell_width: f32,
-        rows: &[(u16, std::ops::Range<u16>)],
-        window: &mut Window,
-    ) {
-        let Some(bounds) = link_bounds(frame, rows) else {
-            return;
-        };
-        let layer = Bounds::new(
-            origin
-                + point(
-                    px(f32::from(bounds.x) * cell_width),
-                    px(f32::from(bounds.y) * self.cell_height),
-                ),
-            size(
-                px(f32::from(bounds.width) * cell_width),
-                px(f32::from(bounds.height) * self.cell_height),
-            ),
-        );
-        window.paint_layer(layer, |window| {
-            for (row, columns) in rows {
-                if *row >= frame.height {
-                    continue;
-                }
-                for column in columns.start..columns.end.min(frame.width) {
-                    let index = usize::from(*row) * usize::from(frame.width) + usize::from(column);
-                    let Some(data) = frame.cells.get(index) else {
-                        continue;
-                    };
-                    // The same snapped corners as the dashes this line replaces.
-                    let top =
-                        f32::from(*row) * self.cell_height + underline_offset(self.cell_height);
-                    window.paint_quad(fill(
-                        grid_rect(
-                            window,
-                            origin,
-                            point(px(f32::from(column) * cell_width), px(top)),
-                            point(px(f32::from(column + 1) * cell_width), px(top + 1.)),
-                        ),
-                        rgb(cell_colors(data, &self.theme).0),
-                    ));
-                }
-            }
-        });
-    }
-
     /// Releases the textures of images no paint has placed for a while, for
     /// frames that paint without placing any.
     pub(crate) fn release_idle_images(&mut self, window: &mut Window) {
@@ -466,6 +367,23 @@ impl TerminalPainter {
         // CPU scene construction only: this does not measure GPU completion.
         let started = Instant::now();
         let mut paint_errors = 0_u64;
+        // Right-to-left rows paint from a copy in visual order, with the
+        // cursor and highlights moved to their cells' visual columns.
+        let reordered = self
+            .bidi
+            .then(|| self.bidi_cache.frame(frame, panes))
+            .flatten();
+        let frame = reordered
+            .as_ref()
+            .map_or(frame, |reordered| &reordered.frame);
+        let moved_highlights;
+        let highlights = match &reordered {
+            Some(reordered) => {
+                moved_highlights = reordered.map.highlights(highlights);
+                &moved_highlights[..]
+            }
+            None => highlights,
+        };
         self.configure(font);
         let cached = true;
         #[cfg(feature = "integration-test")]
@@ -622,6 +540,7 @@ impl TerminalPainter {
                         cached,
                         &in_bar,
                         &shows_through,
+                        reordered.as_deref(),
                         window,
                         #[cfg(feature = "integration-test")]
                         &mut counts,
@@ -641,6 +560,7 @@ impl TerminalPainter {
                     cached,
                     &in_bar,
                     &shows_through,
+                    reordered.as_deref(),
                     window,
                     #[cfg(feature = "integration-test")]
                     &mut counts,
@@ -833,10 +753,26 @@ impl TerminalPainter {
         cached: bool,
         in_bar: &impl Fn(usize) -> bool,
         shows_through: &impl Fn(&CellData) -> bool,
+        reordered: Option<&bidi::Reordered>,
         window: &mut Window,
         #[cfg(feature = "integration-test")] counts: &mut crate::performance::Counts,
     ) -> u64 {
         let mut paint_errors = 0;
+        if let Some(reordered) = reordered {
+            paint_errors += self.paint_runs(
+                reordered,
+                area,
+                origin,
+                cell_width,
+                font,
+                cached,
+                in_bar,
+                shows_through,
+                window,
+                #[cfg(feature = "integration-test")]
+                counts,
+            );
+        }
         for index in cell_ranges(frame, area).flatten() {
             let cell = &frame.cells[index];
             if cell.skip
@@ -882,6 +818,9 @@ impl TerminalPainter {
                     }
                     continue;
                 }
+            }
+            if reordered.is_some_and(|reordered| reordered.in_run(index)) {
+                continue;
             }
             let style = glyphs::style(cell.modifier);
             let newly_shaped;

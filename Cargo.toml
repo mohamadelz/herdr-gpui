@@ -93,6 +93,8 @@ herdr-remote-control         = { default-features = false, path = "crates/herdr-
 herdr-updater        = { path = "crates/herdr-updater" }
 herdr-usage          = { path = "crates/herdr-usage" }
 herdr-vcs            = { path = "crates/herdr-vcs" }
+# Unicode joining types, for Arabic letters a grid cell splits apart.
+icu_properties       = "2.3.0"
 interprocess         = "2.4.2"
 # Local interface addresses, so Bonjour discovery skips this machine; the
 # version mdns-sd already uses.
@@ -197,6 +199,7 @@ tracing              = "0.1"
 # The Azure sandbox exec stream; TLS comes from `rustls` above.
 tungstenite          = { default-features = false, features = ["handshake"], version = "0.30" }
 tracing-subscriber   = { default-features = false, features = ["registry", "std"], version = "0.3" }
+unicode-bidi         = "0.3.18"
 unicode-normalization = "0.1.26"
 unicode-properties   = { version = "0.1.4", default-features = false, features = ["emoji"] }
 unicode-segmentation = "1"

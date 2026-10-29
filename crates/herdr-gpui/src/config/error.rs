@@ -40,6 +40,8 @@ pub enum Error {
     InvalidSidebarMetric { key: &'static str, max: f32 },
     #[error("sound.volume must be between 0 and 100")]
     InvalidSoundVolume,
+    #[error("terminal.bidi must be true or false")]
+    InvalidTerminalBidi,
     #[error(
         "terminal.{0} must be one number or a pair of numbers, each finite and between 0 and 64 logical pixels"
     )]

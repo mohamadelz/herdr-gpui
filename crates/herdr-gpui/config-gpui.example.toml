@@ -445,6 +445,15 @@ size = 14
 # [layout] sidebar_gap, which still loads as the left padding.
 # padding_x = 8
 # padding_y = [4, 8]
+# Draw rows that hold Arabic or Hebrew text right to left, with joined
+# letters, as Terminal.app does. Each pane row is reordered on its own by the
+# Unicode Bidirectional Algorithm; left-to-right text keeps its columns. The
+# cursor, selection, search matches, links, and input method are drawn where
+# their cells are drawn, and clicks reach the cell under the pointer; the
+# program and copied text keep logical order. Lines start at the left edge,
+# and letters in different styles do not join. Default false. Only
+# [terminal] takes this key.
+# bidi = true
 
 [ui]
 # Default: ".SystemUIFont" on macOS and Windows, "DejaVu Sans" on Linux (or an installed
