@@ -151,7 +151,6 @@ pages! {
     general: General, general_data;
     theme: Theme, theme_page;
     sidebar: Sidebar, sidebar_page;
-    #[ignore = "migrating"]
     indicators: Indicators, none;
     #[ignore = "migrating"]
     fonts: Fonts, none;

@@ -2,7 +2,7 @@
 //! tables, which `fl!` cannot check: each must be an English message
 //! without arguments.
 use super::*;
-use crate::config::{Axis, Side};
+use crate::config::{Axis, Side, StatusIcons};
 
 fn assert_message(id: &str) {
     let none: &[&str] = &[];
@@ -23,6 +23,15 @@ fn spacing_rows_name_messages() {
     for spacing in pages::Spacing::ALL {
         let (title, description) = spacing.messages();
         assert_message(title);
+        assert_message(description);
+    }
+}
+
+#[test]
+fn status_icon_sets_name_messages() {
+    for &set in StatusIcons::ALL {
+        let (name, description) = controls::indicators::set_messages(set);
+        assert_message(name);
         assert_message(description);
     }
 }
