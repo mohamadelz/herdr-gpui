@@ -7,6 +7,20 @@ settings-cloud-unavailable = Cloud devices are unavailable on Windows. Accounts 
 settings-cloud-remove = Remove
 settings-cloud-none-yet = None yet.
 
+## Shared by the provider cards.
+
+settings-cloud-checking = Checking…
+settings-cloud-save = Save
+settings-cloud-cancel = Cancel
+settings-cloud-install-herdr = Install Herdr when missing
+# The default among size or image choices; $choice is its name.
+settings-cloud-default-choice = { $choice } (default)
+# Deleting a device's machine at its provider; $name is the device's name.
+settings-cloud-remove-ask = Remove…
+settings-cloud-remove-from-herdr = Remove from Herdr only
+settings-cloud-deleted = Deleted { $name }.
+settings-cloud-delete-failed = Could not delete { $name }: { $error }
+
 ## New device setup.
 
 settings-cloud-setup-run = Run the setup script when it connects
