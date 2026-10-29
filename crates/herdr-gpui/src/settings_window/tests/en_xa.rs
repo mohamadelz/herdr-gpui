@@ -43,12 +43,6 @@ fn tabs_data(view: &SettingsWindow, _: &App) -> Vec<String> {
         .collect()
 }
 
-/// Notifications: the unit after the delay field.
-// TODO(i18n): settings_window::ui::number takes its unit as a static str.
-fn notifications_data(_: &SettingsWindow, _: &App) -> Vec<String> {
-    vec!["s".into()]
-}
-
 /// Configuration: the paths of both files.
 fn configuration_data(view: &SettingsWindow, _: &App) -> Vec<String> {
     let shared = view
@@ -59,7 +53,6 @@ fn configuration_data(view: &SettingsWindow, _: &App) -> Vec<String> {
         .chain(shared)
         .collect()
 }
-
 
 /// The Plugins preview's example workspace and agent, drawn from the same
 /// reports and rows as the page: names, as the sidebar's are, not messages.
@@ -100,39 +93,20 @@ fn plugin_preview(view: &SettingsWindow, cx: &App) -> Vec<String> {
         .collect()
 }
 
-/// A number control's unit and range, which `ui::number` draws as written.
-// TODO(i18n): settings_window::ui::number
-fn number(range: std::ops::RangeInclusive<f32>) -> [String; 2] {
-    [
-        "px".into(),
-        format!("{} to {}", *range.start() as i32, *range.end() as i32),
-    ]
-}
-
 /// The theme names on the cards, and their glyph sample.
 fn theme_page(view: &SettingsWindow, _: &App) -> Vec<String> {
-    let padding =
-        inputs::NumberField::TerminalPadding(crate::config::Axis::X, crate::config::Side::Start);
     let names = view
         .themes
         .filtered
         .iter()
         .map(|choice| choice.name.clone());
-    number(padding.range())
-        .into_iter()
-        .chain(names)
-        .chain(["Aa".into()])
-        .collect()
+    names.chain(["Aa".into()]).collect()
 }
 
 /// The hosts with a colour row, and the spacing numbers.
 fn sidebar_page(view: &SettingsWindow, cx: &App) -> Vec<String> {
     let hosts = view.host_rows(cx).into_iter().map(|(host, ..)| host);
-    pages::Spacing::ALL
-        .into_iter()
-        .flat_map(|spacing| number(inputs::NumberField::Spacing(spacing).range()))
-        .chain(hosts)
-        .collect()
+    hosts.collect()
 }
 
 /// Each face's family, its size, and the terminal's specimen, which is
@@ -146,9 +120,8 @@ fn fonts_page(view: &SettingsWindow, _: &App) -> Vec<String> {
         "println!(\"ready\");",
         "0O 1lI {} [] != <=",
     ];
-    number(crate::config::FONT_SIZE_RANGE)
+    families
         .into_iter()
-        .chain(families)
         .chain(specimen.map(String::from))
         .collect()
 }
@@ -174,7 +147,7 @@ pages! {
     status_bar: StatusBar, none;
     tabs: Tabs, tabs_data;
     code: Code, none;
-    notifications: Notifications, notifications_data;
+    notifications: Notifications, none;
     integrations: Integrations, none;
     plugins: Plugins, plugin_preview;
     #[cfg(feature = "cloud")]

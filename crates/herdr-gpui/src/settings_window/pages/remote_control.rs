@@ -490,7 +490,7 @@ impl SettingsWindow {
                     id: field.selector(),
                     value,
                     range: field.range(),
-                    unit: "",
+                    unit: ui::Unit::None,
                     look: ui::Look::Field,
                     enabled: true,
                 },

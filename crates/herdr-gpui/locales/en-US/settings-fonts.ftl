@@ -51,3 +51,4 @@ settings-fonts-count =
        *[other] { $shown } of { $total } installed families
     }
 settings-fonts-no-match = No matching fonts.
+settings-fonts-search-placeholder = Search installed fonts...

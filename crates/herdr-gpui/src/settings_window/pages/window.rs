@@ -88,7 +88,7 @@ impl SettingsWindow {
                     id: field.selector(),
                     value,
                     range: field.range(),
-                    unit: "px",
+                    unit: ui::Unit::Pixels,
                     look: ui::Look::Slider,
                     enabled: true,
                 },

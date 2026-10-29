@@ -422,7 +422,7 @@ impl SettingsWindow {
                             id: field.selector(),
                             value,
                             range: field.range(),
-                            unit: "px",
+                            unit: ui::Unit::Pixels,
                             look: ui::Look::Slider,
                             enabled: !self.quitting && self.closing.is_none(),
                         },

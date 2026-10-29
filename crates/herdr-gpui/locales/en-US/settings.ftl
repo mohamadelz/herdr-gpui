@@ -53,6 +53,10 @@ settings-position-bottom-center = Bottom center
 settings-position-bottom-right = Bottom right
 # Under a number field with steppers: the values it takes.
 settings-number-range = { $min } to { $max }
+# Units after a number field's value.
+settings-unit-percent = %
+settings-unit-pixels = px
+settings-unit-seconds = s
 # A host with no colour of its own, in place of a colour's hex code.
 settings-swatch-none = none
 

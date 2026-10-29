@@ -83,7 +83,7 @@ impl SettingsWindow {
                         id,
                         value: size,
                         range: FONT_SIZE_RANGE,
-                        unit: "px",
+                        unit: ui::Unit::Pixels,
                         look: ui::Look::Steppers,
                         enabled: true,
                     },

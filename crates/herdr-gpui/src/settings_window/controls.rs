@@ -1,4 +1,5 @@
 //! Prepared controls for the standalone window; persistence belongs to its serial save path.
+// i18n: migrated
 pub(super) mod backdrop;
 pub(super) mod chat_env;
 pub(super) mod code;
@@ -20,11 +21,12 @@ use crate::{
 };
 use gpui::{prelude::*, *};
 
+/// Each face, with the message naming it.
 pub(in crate::settings_window) const FACES: [(FontFace, &str); 4] = [
-    (FontFace::Terminal, "Terminal"),
-    (FontFace::Sidebar, "Sidebar"),
-    (FontFace::Tabs, "Tabs"),
-    (FontFace::Ui, "Interface"),
+    (FontFace::Terminal, face_message(FontFace::Terminal)),
+    (FontFace::Sidebar, face_message(FontFace::Sidebar)),
+    (FontFace::Tabs, face_message(FontFace::Tabs)),
+    (FontFace::Ui, face_message(FontFace::Ui)),
 ];
 
 pub(super) struct Controls {
@@ -55,7 +57,7 @@ impl Controls {
     pub(super) fn new(cx: &mut Context<SettingsWindow>) -> Self {
         let search = cx.new(SearchInput::new);
         search.update(cx, |input, cx| {
-            input.set_placeholder("Search installed fonts...", cx)
+            input.set_placeholder(&crate::i18n::fl!("settings-fonts-search-placeholder"), cx)
         });
         let subscription = cx.subscribe(&search, |this, search, _: &Changed, cx| {
             this.controls.filtered = filter_fonts(&this.controls.names, search.read(cx).text());
@@ -94,7 +96,12 @@ impl Controls {
             saving_sizes: Vec::new(),
             local_path: Config::local_path()
                 .map(|path| path.display().to_string())
-                .unwrap_or_else(|error| format!("Unavailable ({error})")),
+                .unwrap_or_else(|error| {
+                    crate::i18n::fl!(
+                        "settings-configuration-path-unavailable",
+                        error = error.to_string()
+                    )
+                }),
             local_file: Config::local_path().ok(),
             ruler: backdrop::Ruler::default(),
             _search_changed: subscription,
