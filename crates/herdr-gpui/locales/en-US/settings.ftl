@@ -25,6 +25,36 @@ settings-error-system-appearance = Apply system appearance: { $error }
 # Which app a setting belongs to, as a tag beside it.
 settings-source-herdr = Herdr
 settings-source-herdr-ui = Herdr UI
+# The footer after a save: what went wrong saving or reading the files back.
+settings-saved-unreloaded = Saved; could not reload current preferences
+settings-save-failed-reloaded = Save failed; reloaded current preferences
+settings-save-failed = Save failed; reload before editing again
+settings-saved-daemon-unqueued = Saved; daemon reload not queued: { $error }
+settings-error-save = Save settings: { $error }
+settings-error-reload = Could not reload settings; keeping current preferences: { $error }
+settings-error-load-herdr = Load Herdr settings: { $error }
+
+## Shared by the pages' controls.
+
+# Why rows that edit Herdr's own file are disabled.
+settings-shared-read-only = Herdr's settings are read-only on this platform.
+settings-shared-unavailable = Herdr's settings are unavailable. Reload to retry.
+# The first entry of a dropdown that can follow Herdr's file, with the
+# value Herdr has; the other entries override it.
+settings-use-herdr = Use Herdr setting · { $value }
+settings-on = On
+settings-off = Off
+# Where a notification appears in the window.
+settings-position-top-left = Top left
+settings-position-top-center = Top center
+settings-position-top-right = Top right
+settings-position-bottom-left = Bottom left
+settings-position-bottom-center = Bottom center
+settings-position-bottom-right = Bottom right
+# Under a number field with steppers: the values it takes.
+settings-number-range = { $min } to { $max }
+# A host with no colour of its own, in place of a colour's hex code.
+settings-swatch-none = none
 
 ## Groups of pages in the section list.
 

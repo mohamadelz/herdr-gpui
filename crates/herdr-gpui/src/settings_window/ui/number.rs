@@ -1,6 +1,7 @@
 //! A number with typed entry, and -/+ steppers and an optional drag slider
 //! unless it is a bare field.
 use crate::config::{Theme, corners};
+use crate::i18n::fl;
 use crate::search_input::SearchInput;
 use gpui::{prelude::*, *};
 use std::{cell::Cell, ops::RangeInclusive, rc::Rc};
@@ -244,10 +245,10 @@ pub(in crate::settings_window) fn number(
             div()
                 .text_size(px(10.))
                 .text_color(rgb(theme.muted))
-                .child(format!(
-                    "{} to {}",
-                    *range.start() as i32,
-                    *range.end() as i32
+                .child(fl!(
+                    "settings-number-range",
+                    min = *range.start() as i32,
+                    max = *range.end() as i32
                 )),
         )
     })

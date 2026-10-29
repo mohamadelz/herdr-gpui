@@ -18,6 +18,7 @@ mod load_save;
 mod navigation_groups;
 mod navigation_resize;
 mod navigation_scroll;
+mod page_messages;
 mod pages_behaviour;
 mod quit_saves;
 mod remote_control;

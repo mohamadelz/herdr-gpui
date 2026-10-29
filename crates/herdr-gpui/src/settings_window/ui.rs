@@ -1,5 +1,6 @@
 //! Shared row and control builders for the Settings pages. Pure rendering:
 //! they take the theme and return elements; state and saves stay on the view.
+// i18n: migrated
 use crate::{
     config::{Theme, corners},
     i18n::fl,

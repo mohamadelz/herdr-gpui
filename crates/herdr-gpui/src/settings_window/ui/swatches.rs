@@ -3,6 +3,7 @@
 use crate::{
     config::{FontConfig, Theme, corners, parse_hex},
     fonts::StyledFont,
+    i18n::fl,
     search_input::SearchInput,
 };
 use gpui::{prelude::*, *};
@@ -113,7 +114,7 @@ pub(in crate::settings_window) fn swatch_row(
             None => {
                 let (label, color) = match current {
                     Some(color) => (format!("#{color:06x}"), theme.foreground),
-                    None => ("none".to_owned(), theme.muted),
+                    None => (fl!("settings-swatch-none"), theme.muted),
                 };
                 hex.text_font(mono)
                     .text_color(rgb(color))

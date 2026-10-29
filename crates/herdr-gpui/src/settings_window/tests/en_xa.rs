@@ -29,6 +29,37 @@ fn none(_: &SettingsWindow, _: &App) -> Vec<String> {
     Vec::new()
 }
 
+/// General: only messages.
+fn general_data(_: &SettingsWindow, _: &App) -> Vec<String> {
+    Vec::new()
+}
+
+/// Tabs & panes: each SSH host's name above its scrollback switch.
+fn tabs_data(view: &SettingsWindow, _: &App) -> Vec<String> {
+    view.remote_history
+        .hosts()
+        .iter()
+        .map(|host| host.label.clone())
+        .collect()
+}
+
+/// Notifications: the unit after the delay field.
+// TODO(i18n): settings_window::ui::number takes its unit as a static str.
+fn notifications_data(_: &SettingsWindow, _: &App) -> Vec<String> {
+    vec!["s".into()]
+}
+
+/// Configuration: the paths of both files.
+fn configuration_data(view: &SettingsWindow, _: &App) -> Vec<String> {
+    let shared = view
+        .shared
+        .as_ref()
+        .map(|shared| shared.path.display().to_string());
+    std::iter::once(view.controls.local_path.clone())
+        .chain(shared)
+        .collect()
+}
+
 macro_rules! pages {
     ($($(#[$attr:meta])* $name:ident: $section:ident, $data:expr;)+) => {
         $(
@@ -42,8 +73,7 @@ macro_rules! pages {
 }
 
 pages! {
-    #[ignore = "migrating"]
-    general: General, none;
+    general: General, general_data;
     #[ignore = "migrating"]
     theme: Theme, none;
     #[ignore = "migrating"]
@@ -54,12 +84,10 @@ pages! {
     fonts: Fonts, none;
     #[ignore = "migrating"]
     status_bar: StatusBar, none;
-    #[ignore = "migrating"]
-    tabs: Tabs, none;
+    tabs: Tabs, tabs_data;
     #[ignore = "migrating"]
     code: Code, none;
-    #[ignore = "migrating"]
-    notifications: Notifications, none;
+    notifications: Notifications, notifications_data;
     #[ignore = "migrating"]
     integrations: Integrations, none;
     #[ignore = "migrating"]
@@ -69,6 +97,5 @@ pages! {
     cloud_devices: CloudDevices, none;
     #[ignore = "migrating"]
     remote_control: RemoteControl, none;
-    #[ignore = "migrating"]
-    configuration: Configuration, none;
+    configuration: Configuration, configuration_data;
 }
