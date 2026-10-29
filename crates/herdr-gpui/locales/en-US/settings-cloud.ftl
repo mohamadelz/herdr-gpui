@@ -18,7 +18,8 @@ settings-cloud-new-sandbox = New sandbox
 settings-cloud-create-sandbox = Create sandbox
 settings-cloud-finish-setup = Finish setup
 # A job the main window runs; $name is the new device's name.
-settings-cloud-setting-up = Setting up { $name }. The device picker shows its progress.
+settings-cloud-creating = Creating { $name }. The device picker shows its progress.
+settings-cloud-setting-up =Setting up { $name }. The device picker shows its progress.
 settings-cloud-no-window-sandbox = Open a main Herdr window to create a sandbox.
 # An account's API key or token, kept in the credential store.
 settings-cloud-api-key = API key
