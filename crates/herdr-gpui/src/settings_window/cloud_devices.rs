@@ -106,8 +106,7 @@ fn input(
     feature = "boat",
     feature = "coder",
     feature = "container",
-    feature = "daytona",
-    feature = "opensandbox"
+    feature = "daytona"
 ))]
 #[derive(Clone, Copy, Debug)]
 enum Hint {
@@ -119,8 +118,7 @@ enum Hint {
     feature = "boat",
     feature = "coder",
     feature = "container",
-    feature = "daytona",
-    feature = "opensandbox"
+    feature = "daytona"
 ))]
 impl Hint {
     fn text(self) -> String {
