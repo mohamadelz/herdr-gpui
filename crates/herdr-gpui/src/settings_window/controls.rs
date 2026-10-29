@@ -65,7 +65,10 @@ impl Controls {
         });
         let integration_search = cx.new(SearchInput::new);
         integration_search.update(cx, |input, cx| {
-            input.set_placeholder("Search integrations by name or ID...", cx)
+            input.set_placeholder(
+                &crate::i18n::fl!("settings-integrations-search-placeholder"),
+                cx,
+            )
         });
         let integration_changed = cx.subscribe(&integration_search, |this, _, _: &Changed, cx| {
             this.body_scroll.set_offset(Point::default());

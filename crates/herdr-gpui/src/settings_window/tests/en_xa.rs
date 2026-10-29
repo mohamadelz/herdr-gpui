@@ -87,7 +87,6 @@ pages! {
     tabs: Tabs, tabs_data;
     code: Code, none;
     notifications: Notifications, notifications_data;
-    #[ignore = "migrating"]
     integrations: Integrations, none;
     #[ignore = "migrating"]
     plugins: Plugins, none;
