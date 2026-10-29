@@ -171,7 +171,6 @@ pages! {
     sidebar: Sidebar, sidebar_page;
     indicators: Indicators, none;
     fonts: Fonts, fonts_page;
-    #[ignore = "migrating"]
     status_bar: StatusBar, none;
     tabs: Tabs, tabs_data;
     code: Code, none;
