@@ -8,7 +8,7 @@ pub(super) mod indicators;
 pub(super) mod plugins;
 #[cfg(all(feature = "integration-test", target_os = "macos"))]
 pub(super) use fonts::native_probe;
-pub(super) use fonts::{face_font, family_label};
+pub(super) use fonts::{face_font, face_message, family_label};
 pub(super) mod preferences;
 pub(super) mod px0;
 

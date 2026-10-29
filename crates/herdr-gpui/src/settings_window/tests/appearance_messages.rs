@@ -35,3 +35,10 @@ fn status_icon_sets_name_messages() {
         assert_message(description);
     }
 }
+
+#[test]
+fn font_faces_name_messages() {
+    for (face, _) in controls::FACES {
+        assert_message(controls::face_message(face));
+    }
+}

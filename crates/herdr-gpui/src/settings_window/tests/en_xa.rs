@@ -135,6 +135,24 @@ fn sidebar_page(view: &SettingsWindow, cx: &App) -> Vec<String> {
         .collect()
 }
 
+/// Each face's family, its size, and the terminal's specimen, which is
+/// code.
+fn fonts_page(view: &SettingsWindow, _: &App) -> Vec<String> {
+    let families =
+        controls::FACES.map(|(face, _)| controls::face_font(&view.config, face).family.to_string());
+    let specimen = [
+        "let answer = 42;",
+        "if answer != 0 {",
+        "println!(\"ready\");",
+        "0O 1lI {} [] != <=",
+    ];
+    number(crate::config::FONT_SIZE_RANGE)
+        .into_iter()
+        .chain(families)
+        .chain(specimen.map(String::from))
+        .collect()
+}
+
 macro_rules! pages {
     ($($(#[$attr:meta])* $name:ident: $section:ident, $data:expr;)+) => {
         $(
@@ -152,8 +170,7 @@ pages! {
     theme: Theme, theme_page;
     sidebar: Sidebar, sidebar_page;
     indicators: Indicators, none;
-    #[ignore = "migrating"]
-    fonts: Fonts, none;
+    fonts: Fonts, fonts_page;
     #[ignore = "migrating"]
     status_bar: StatusBar, none;
     tabs: Tabs, tabs_data;
