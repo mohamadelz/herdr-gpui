@@ -1,6 +1,9 @@
 //! Shared row and control builders for the Settings pages. Pure rendering:
 //! they take the theme and return elements; state and saves stay on the view.
-use crate::config::{Theme, corners};
+use crate::{
+    config::{Theme, corners},
+    i18n::fl,
+};
 use gpui::{prelude::*, *};
 use std::rc::Rc;
 
@@ -26,8 +29,8 @@ pub(in crate::settings_window) enum Source {
 
 pub(in crate::settings_window) fn tag(theme: &Theme, source: Source) -> Div {
     let (label, color) = match source {
-        Source::Herdr => ("Herdr", theme.ink(0x8fb8d9)),
-        Source::HerdrUi => ("Herdr UI", theme.ink(0xc9b26f)),
+        Source::Herdr => (fl!("settings-source-herdr"), theme.ink(0x8fb8d9)),
+        Source::HerdrUi => (fl!("settings-source-herdr-ui"), theme.ink(0xc9b26f)),
     };
     div()
         .text_size(px(9.))
@@ -43,7 +46,7 @@ pub(in crate::settings_window) fn tag(theme: &Theme, source: Source) -> Div {
 
 pub(in crate::settings_window) fn section(
     theme: &Theme,
-    title: &'static str,
+    title: &str,
     tag_source: Option<Source>,
 ) -> Div {
     div()

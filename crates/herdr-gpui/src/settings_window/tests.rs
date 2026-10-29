@@ -8,6 +8,7 @@ use std::sync::{
 
 mod activity_bar_windows;
 mod config_watch;
+mod en_xa;
 mod gpu_settings;
 mod language_reload;
 #[cfg(windows)]

@@ -10,6 +10,7 @@ use crate::{
         preferences::Preference,
     },
     herdr_settings::Edit,
+    i18n,
 };
 use gpui::{prelude::*, *};
 
@@ -274,8 +275,8 @@ impl SettingsWindow {
             .map(|&feature| {
                 let id = feature.setting_id();
                 let on = features.enabled(feature);
-                ui::row(&self.theme, id, feature.label())
-                    .description(feature.description())
+                ui::row(&self.theme, id, i18n::message(feature.message(), &[]))
+                    .description(i18n::message(feature.description_message(), &[]))
                     .switch(self.preference_toggle(
                         format!("{id}-toggle"),
                         on,
