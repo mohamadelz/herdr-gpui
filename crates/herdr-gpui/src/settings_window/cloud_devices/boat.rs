@@ -5,7 +5,7 @@
 
 use super::{
     super::{Section, SettingsWindow},
-    follow_config, input,
+    Hint, follow_config, input,
 };
 use crate::{
     boat::{
@@ -24,25 +24,27 @@ use crate::{
 use gpui::{prelude::*, *};
 use secrecy::SecretString;
 
-/// Each field's label and placeholder, as message IDs; the API URL's
-/// placeholder is the default URL itself.
-const FIELDS: [(&str, Option<&str>); 5] = [
-    ("settings-cloud-boat-api-url", None),
+/// Each field's label, as a message ID, and placeholder.
+const FIELDS: [(&str, Hint); 5] = [
+    (
+        "settings-cloud-boat-api-url",
+        Hint::Value(crate::boat::DEFAULT_API_URL),
+    ),
     (
         "settings-cloud-boat-organization",
-        Some("settings-cloud-boat-organization-placeholder"),
+        Hint::Message("settings-cloud-boat-organization-placeholder"),
     ),
     (
         "settings-cloud-boat-machine-type",
-        Some("settings-cloud-boat-machine-type-placeholder"),
+        Hint::Message("settings-cloud-boat-machine-type-placeholder"),
     ),
     (
         "settings-cloud-boat-environment",
-        Some("settings-cloud-boat-environment-placeholder"),
+        Hint::Message("settings-cloud-boat-environment-placeholder"),
     ),
     (
         "settings-cloud-boat-auto-stop",
-        Some("settings-cloud-boat-auto-stop-placeholder"),
+        Hint::Message("settings-cloud-boat-auto-stop-placeholder"),
     ),
 ];
 
@@ -82,11 +84,7 @@ impl BoatCard {
         let loaded = loaded(config);
         let texts = texts(&loaded);
         let fields = std::array::from_fn(|index| {
-            let placeholder = match FIELDS[index].1 {
-                Some(id) => i18n::message(id, &[]),
-                None => crate::boat::DEFAULT_API_URL.to_owned(),
-            };
-            input(&placeholder, texts[index], config, theme, cx)
+            input(&FIELDS[index].1.text(), texts[index], config, theme, cx)
         });
         // A Boat key's prefix.
         let key = input("boat_…", "", config, theme, cx); // i18n: data

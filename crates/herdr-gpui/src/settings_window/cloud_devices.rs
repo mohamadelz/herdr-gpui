@@ -100,6 +100,37 @@ fn input(
     input
 }
 
+/// A field's placeholder: a message, or a value shown as it is, such as a
+/// default URL or image.
+#[cfg(any(
+    feature = "boat",
+    feature = "coder",
+    feature = "container",
+    feature = "daytona",
+    feature = "opensandbox"
+))]
+#[derive(Clone, Copy, Debug)]
+enum Hint {
+    Message(&'static str),
+    Value(&'static str),
+}
+
+#[cfg(any(
+    feature = "boat",
+    feature = "coder",
+    feature = "container",
+    feature = "daytona",
+    feature = "opensandbox"
+))]
+impl Hint {
+    fn text(self) -> String {
+        match self {
+            Self::Message(id) => crate::i18n::message(id, &[]),
+            Self::Value(value) => value.to_owned(),
+        }
+    }
+}
+
 /// Follow a reloaded config in a card's inputs: a field still showing what
 /// was loaded last takes the new value, and one the user has edited keeps the
 /// edit, so a later Save neither writes stale values back nor drops typing.
