@@ -1,5 +1,6 @@
 //! Host colour row: a curated swatch strip, a "none" swatch, a hex field and
 //! a reset glyph. Pure rendering; the page owns the colour and the saves.
+// i18n: migrated
 use crate::{
     config::{FontConfig, Theme, corners, parse_hex},
     fonts::StyledFont,
@@ -40,7 +41,7 @@ pub(in crate::settings_window) fn swatch_row(
     index: usize,
     current: Option<u32>,
     mono: &FontConfig,
-    hint: &'static str,
+    hint: SharedString,
     hex_input: Option<(Entity<SearchInput>, bool)>,
     on_change: impl Fn(HostColorChange, &mut Window, &mut App) + 'static,
     on_edit_hex: impl Fn(&mut Window, &mut App) + 'static,

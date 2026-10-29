@@ -125,6 +125,16 @@ fn theme_page(view: &SettingsWindow, _: &App) -> Vec<String> {
         .collect()
 }
 
+/// The hosts with a colour row, and the spacing numbers.
+fn sidebar_page(view: &SettingsWindow, cx: &App) -> Vec<String> {
+    let hosts = view.host_rows(cx).into_iter().map(|(host, ..)| host);
+    pages::Spacing::ALL
+        .into_iter()
+        .flat_map(|spacing| number(inputs::NumberField::Spacing(spacing).range()))
+        .chain(hosts)
+        .collect()
+}
+
 macro_rules! pages {
     ($($(#[$attr:meta])* $name:ident: $section:ident, $data:expr;)+) => {
         $(
@@ -140,8 +150,7 @@ macro_rules! pages {
 pages! {
     general: General, general_data;
     theme: Theme, theme_page;
-    #[ignore = "migrating"]
-    sidebar: Sidebar, none;
+    sidebar: Sidebar, sidebar_page;
     #[ignore = "migrating"]
     indicators: Indicators, none;
     #[ignore = "migrating"]

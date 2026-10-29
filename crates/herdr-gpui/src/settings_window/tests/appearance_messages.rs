@@ -17,3 +17,12 @@ fn padding_sides_name_messages() {
         }
     }
 }
+
+#[test]
+fn spacing_rows_name_messages() {
+    for spacing in pages::Spacing::ALL {
+        let (title, description) = spacing.messages();
+        assert_message(title);
+        assert_message(description);
+    }
+}
