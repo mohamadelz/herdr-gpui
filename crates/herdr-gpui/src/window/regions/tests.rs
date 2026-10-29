@@ -62,6 +62,7 @@ fn frame(rows: &[&str]) -> FrameData {
 
 fn look() -> Look {
     Look {
+        bidi: false,
         font: gpui::font("Menlo"),
         font_size: 14.,
         cell_width: 8.5,
@@ -196,4 +197,36 @@ fn only_regions_whose_paint_changed_are_replaced(cx: &mut TestAppContext) {
     assert_ne!(fourth[0], third[0]);
     assert_ne!(fourth[1], third[1]);
     assert_eq!(fourth[2], third[2]);
+}
+
+#[gpui::test]
+fn turning_bidi_on_or_off_repaints_unchanged_regions(cx: &mut TestAppContext) {
+    let (view, cx) = cx.add_window_view(fixture_window);
+    // Hebrew after a prompt, which bidi draws in the other order.
+    let surface = PaneSurfaceFrame {
+        boot_id: String::new(),
+        projection_revision: 0,
+        surface_revision: 1,
+        frame: frame(&["$ שלום|bbbb"]),
+        panes: vec![pane("a", rect(0, 0, 6, 1)), pane("b", rect(7, 0, 4, 1))],
+        splits: vec![],
+        popup: None,
+        graphics: Default::default(),
+    };
+    let off = draw(&view, &surface, cx);
+    assert_eq!(draw(&view, &surface, cx), off);
+    // A config reload that only turns bidi on keeps every cell, yet each
+    // region paints with the new order rather than its cached scene.
+    view.update(cx, |view, _| view.config.terminal_bidi = true);
+    let on = draw(&view, &surface, cx);
+    for (old, new) in off.iter().zip(&on) {
+        assert_eq!(old.0, new.0);
+        assert_ne!(old.1, new.1, "{:?}", old.0);
+    }
+    assert_eq!(draw(&view, &surface, cx), on);
+    view.update(cx, |view, _| view.config.terminal_bidi = false);
+    let again = draw(&view, &surface, cx);
+    for (old, new) in on.iter().zip(&again) {
+        assert_ne!(old.1, new.1, "{:?}", old.0);
+    }
 }

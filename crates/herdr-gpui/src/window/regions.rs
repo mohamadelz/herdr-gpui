@@ -24,6 +24,8 @@ enum Owner {
 /// Everything besides the cells that changes how a region paints.
 #[derive(Clone, PartialEq)]
 pub(super) struct Look {
+    /// Right-to-left rows drawn in visual order (`[terminal] bidi`).
+    pub(super) bidi: bool,
     pub(super) font: Font,
     pub(super) font_size: f32,
     pub(super) cell_width: f32,

@@ -73,8 +73,13 @@ impl ColumnMap {
 
     /// A pointer `column` (in cells, with its fraction) read in logical
     /// columns. Inside a right-to-left cell the fraction turns round too, so
-    /// the half nearer the cell's logical start stays the left side.
+    /// the half nearer the cell's logical start stays the left side. The
+    /// cell's visual left edge is its logical end, kept just inside the cell
+    /// so that it never reads as the next logical cell.
     pub(crate) fn logical_position(&self, row: u16, column: f32) -> f32 {
+        /// The largest mirrored fraction: inside the cell after a round trip
+        /// through pixels, and far less than a pixel from its edge.
+        const LAST_FRACTION: f32 = 1. - 1. / 256.;
         if !(0. ..f32::from(u16::MAX)).contains(&column) {
             return column;
         }
@@ -85,7 +90,7 @@ impl ColumnMap {
         let logical = layout.logical[offset];
         let fraction = column.fract();
         let fraction = if layout.rtl[logical] {
-            1. - fraction
+            (1. - fraction).min(LAST_FRACTION)
         } else {
             fraction
         };

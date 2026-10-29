@@ -2,7 +2,7 @@
 //! highlights, links, and the pointer translate through.
 
 use super::*;
-use crate::terminal_painter::bidi::{Cache, reorder};
+use crate::terminal_painter::bidi::{Cache, ColumnMap, reorder};
 use anyhow::Context as _;
 use herdr_client::protocol::CursorState;
 
@@ -55,6 +55,47 @@ fn a_pointer_inside_a_right_to_left_cell_turns_round() {
     // Off the row, or on a row the map does not hold, nothing changes.
     assert_eq!(map.logical_position(0, -1.), -1.);
     assert_eq!(map.logical_position(1, 2.25), 2.25);
+}
+
+/// The logical cell under a pointer, and whether it is on that cell's end
+/// side, as the selection and `wheel_target` read it.
+fn cell_and_side(map: &ColumnMap, column: f32) -> (u16, bool) {
+    let logical = map.logical_position(0, column);
+    (logical.floor() as u16, logical.fract() >= 0.5)
+}
+
+#[test]
+fn a_pointer_on_a_right_to_left_cell_edge_stays_in_that_cell() {
+    // "$ םולש" on screen: visual 2..6 are the logical cells 5, 4, 3, 2.
+    let map = Cache::default().row_map(&row("$ שלום", 10), &[], 0);
+    // The visual left edge of each Hebrew cell is that cell's logical end.
+    for (visual, logical) in [(2., 5), (3., 4), (4., 3), (5., 2)] {
+        assert_eq!(cell_and_side(&map, visual), (logical, true), "{visual}");
+    }
+    // A hair right of the edge, too small to survive `1 - fraction`.
+    assert_eq!(cell_and_side(&map, 2. + 1e-8), (5, true));
+    // The run's right end is shin's logical start; the next cell is plain.
+    assert_eq!(cell_and_side(&map, 5.999), (2, false));
+    assert_eq!(cell_and_side(&map, 6.), (6, false));
+    // The left-to-right neighbours keep their columns at their edges.
+    assert_eq!(cell_and_side(&map, 1.), (1, false));
+    assert_eq!(cell_and_side(&map, 1.999), (1, true));
+}
+
+#[test]
+fn a_right_to_left_run_between_left_to_right_words_keeps_its_edges() {
+    // "hello ابحرم world": visual 6..11 are the logical cells 10 down to 6.
+    let map = Cache::default().row_map(&row("hello مرحبا world", 17), &[], 0);
+    assert_eq!(cell_and_side(&map, 5.), (5, false));
+    assert_eq!(cell_and_side(&map, 5.999), (5, true));
+    assert_eq!(cell_and_side(&map, 6.), (10, true));
+    assert_eq!(cell_and_side(&map, 10.), (6, true));
+    assert_eq!(cell_and_side(&map, 10.999), (6, false));
+    assert_eq!(cell_and_side(&map, 11.), (11, false));
+    // Through pixels and back, as the window and `wheel_target` read it.
+    let cell_width = 8.4_f32;
+    let x = map.logical_position(0, 6.) * cell_width;
+    assert_eq!((x / cell_width).floor() as u16, 10);
 }
 
 #[test]

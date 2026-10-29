@@ -215,6 +215,7 @@ impl Render for HerdrWindow {
             .unwrap_or_default();
         highlights.extend(pane_selection);
         let look = super::regions::Look {
+            bidi: self.config.terminal_bidi,
             font: font.clone(),
             font_size: self.config.terminal.size,
             cell_width,
