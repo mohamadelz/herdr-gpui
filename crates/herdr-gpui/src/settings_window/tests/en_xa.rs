@@ -60,6 +60,46 @@ fn configuration_data(view: &SettingsWindow, _: &App) -> Vec<String> {
         .collect()
 }
 
+
+/// The Plugins preview's example workspace and agent, drawn from the same
+/// reports and rows as the page: names, as the sidebar's are, not messages.
+/// The preview is narrow and truncates them, so each name's prefixes count.
+fn plugin_preview(view: &SettingsWindow, cx: &App) -> Vec<String> {
+    use crate::plugin_values::{
+        PreviewPart, PreviewSource, preview_agent, preview_space, sidebar_values,
+    };
+    let reports = view
+        .source
+        .upgrade()
+        .map(|source| source.read(cx).plugin_reports())
+        .unwrap_or_default();
+    let layout = &view.config.sidebar_layout;
+    let values = sidebar_values(&reports, layout);
+    let source = PreviewSource {
+        values: &values,
+        label_sample: reports
+            .iter()
+            .find_map(|report| report.label_sample.as_deref()),
+        machine: (reports.len() > 1).then(|| reports[0].host.as_str()),
+    };
+    preview_space(&layout.spaces, &source)
+        .into_iter()
+        .chain(preview_agent(&layout.agents, &source))
+        .flatten()
+        .filter_map(|part| match part {
+            PreviewPart::Text(text, ..) => Some(text),
+            PreviewPart::StateIcon => None,
+        })
+        .flat_map(|name| {
+            name.char_indices()
+                .map(|(at, _)| name[..at].to_owned())
+                .skip(1)
+                .chain([name.clone()])
+                .collect::<Vec<_>>()
+        })
+        .collect()
+}
+
 macro_rules! pages {
     ($($(#[$attr:meta])* $name:ident: $section:ident, $data:expr;)+) => {
         $(
@@ -88,8 +128,7 @@ pages! {
     code: Code, none;
     notifications: Notifications, notifications_data;
     integrations: Integrations, none;
-    #[ignore = "migrating"]
-    plugins: Plugins, none;
+    plugins: Plugins, plugin_preview;
     #[cfg(feature = "cloud")]
     #[ignore = "migrating"]
     cloud_devices: CloudDevices, none;
