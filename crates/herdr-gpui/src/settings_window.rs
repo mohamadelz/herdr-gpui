@@ -1,4 +1,5 @@
 //! Independent native preferences window. Disk work never owns a window or a socket.
+// i18n: migrated
 mod catalog;
 #[cfg(feature = "cloud")]
 mod cloud_devices;

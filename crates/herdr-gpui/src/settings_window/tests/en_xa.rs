@@ -127,7 +127,7 @@ fn fonts_page(view: &SettingsWindow, _: &App) -> Vec<String> {
 }
 
 /// Cloud devices on its first provider's tab: the provider names on the
-/// tabs and the card's title.
+/// tabs; `cloud_devices/tests/en_xa.rs` opens every card.
 #[cfg(feature = "cloud")]
 fn cloud_devices_data(_: &SettingsWindow, _: &App) -> Vec<String> {
     crate::cloud::CloudProvider::ALL
