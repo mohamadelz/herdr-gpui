@@ -126,6 +126,16 @@ fn fonts_page(view: &SettingsWindow, _: &App) -> Vec<String> {
         .collect()
 }
 
+/// Cloud devices on its first provider's tab: the provider names on the
+/// tabs and the card's title.
+#[cfg(feature = "cloud")]
+fn cloud_devices_data(_: &SettingsWindow, _: &App) -> Vec<String> {
+    crate::cloud::CloudProvider::ALL
+        .iter()
+        .map(|&provider| crate::cloud::name(provider).to_owned())
+        .collect()
+}
+
 macro_rules! pages {
     ($($(#[$attr:meta])* $name:ident: $section:ident, $data:expr;)+) => {
         $(
@@ -151,8 +161,7 @@ pages! {
     integrations: Integrations, none;
     plugins: Plugins, plugin_preview;
     #[cfg(feature = "cloud")]
-    #[ignore = "migrating"]
-    cloud_devices: CloudDevices, none;
+    cloud_devices: CloudDevices, cloud_devices_data;
     remote_control: RemoteControl, none;
     configuration: Configuration, configuration_data;
 }

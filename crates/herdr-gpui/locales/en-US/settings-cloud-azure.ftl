@@ -62,8 +62,10 @@ settings-cloud-azure-size-other-detail = Any size the region offers
 settings-cloud-azure-size-use = Use size
 settings-cloud-azure-sandbox-sizes-note = Billed per second at Container Apps rates in { $location } while running; a suspended sandbox is not billed for CPU or memory.
 settings-cloud-azure-sandbox-sizes-unknown = Memory is 2 GiB and disk 20 GiB per vCPU.
-# $size is the size's specs, $price what it costs an hour.
-settings-cloud-azure-sandbox-price = { $size } · { $price } while running
+# $size is the size's vCPUs and memory, $disk its disk in GiB, $price what
+# it costs an hour.
+settings-cloud-azure-sandbox-size = { $size } · { $disk } GiB disk
+settings-cloud-azure-sandbox-price = { $size } · { $disk } GiB disk · { $price } while running
 settings-cloud-azure-vcpu = { $cores } vCPU
 
 ## Azure devices.

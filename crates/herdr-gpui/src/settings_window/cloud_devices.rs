@@ -2,6 +2,7 @@
 //! app uses as devices. Each provider's card keeps its own fields and account
 //! state; this section only switches between them, so another provider adds a
 //! tab and a card.
+// i18n: migrated
 
 #[cfg(feature = "azure")]
 mod azure;
@@ -461,3 +462,6 @@ impl SettingsWindow {
             )
     }
 }
+
+#[cfg(test)]
+mod tests;

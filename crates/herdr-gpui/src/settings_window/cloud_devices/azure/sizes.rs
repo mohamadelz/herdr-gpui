@@ -67,10 +67,15 @@ fn sandbox_line(catalog: Option<&Catalog>, size: SandboxSize) -> String {
     match catalog.and_then(|catalog| catalog.sandbox_rates) {
         Some(rates) => fl!(
             "settings-cloud-azure-sandbox-price",
-            size = size.summary(),
+            size = size.short(),
+            disk = size.disk_gib(),
             price = rates.hourly(size).text(false)
         ),
-        None => size.summary(),
+        None => fl!(
+            "settings-cloud-azure-sandbox-size",
+            size = size.short(),
+            disk = size.disk_gib()
+        ),
     }
 }
 
@@ -130,16 +135,14 @@ impl SettingsWindow {
         enabled: bool,
     ) -> Stateful<Div> {
         let muted = rgb(self.theme.muted);
+        // Lines wrap rather than cut off, as a translation may run longer.
         self.control_choice(
             id,
-            div()
-                .min_w_0()
-                .child(div().truncate().child(title))
-                .children(
-                    detail
-                        .into_iter()
-                        .map(|line| div().truncate().text_color(muted).child(line)),
-                ),
+            div().min_w_0().child(div().child(title)).children(
+                detail
+                    .into_iter()
+                    .map(|line| div().text_color(muted).child(line)),
+            ),
             selected,
             enabled,
         )
