@@ -100,6 +100,31 @@ fn plugin_preview(view: &SettingsWindow, cx: &App) -> Vec<String> {
         .collect()
 }
 
+/// A number control's unit and range, which `ui::number` draws as written.
+// TODO(i18n): settings_window::ui::number
+fn number(range: std::ops::RangeInclusive<f32>) -> [String; 2] {
+    [
+        "px".into(),
+        format!("{} to {}", *range.start() as i32, *range.end() as i32),
+    ]
+}
+
+/// The theme names on the cards, and their glyph sample.
+fn theme_page(view: &SettingsWindow, _: &App) -> Vec<String> {
+    let padding =
+        inputs::NumberField::TerminalPadding(crate::config::Axis::X, crate::config::Side::Start);
+    let names = view
+        .themes
+        .filtered
+        .iter()
+        .map(|choice| choice.name.clone());
+    number(padding.range())
+        .into_iter()
+        .chain(names)
+        .chain(["Aa".into()])
+        .collect()
+}
+
 macro_rules! pages {
     ($($(#[$attr:meta])* $name:ident: $section:ident, $data:expr;)+) => {
         $(
@@ -114,8 +139,7 @@ macro_rules! pages {
 
 pages! {
     general: General, general_data;
-    #[ignore = "migrating"]
-    theme: Theme, none;
+    theme: Theme, theme_page;
     #[ignore = "migrating"]
     sidebar: Sidebar, none;
     #[ignore = "migrating"]
