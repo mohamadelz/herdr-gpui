@@ -95,7 +95,6 @@ pages! {
     #[cfg(feature = "cloud")]
     #[ignore = "migrating"]
     cloud_devices: CloudDevices, none;
-    #[ignore = "migrating"]
     remote_control: RemoteControl, none;
     configuration: Configuration, configuration_data;
 }
