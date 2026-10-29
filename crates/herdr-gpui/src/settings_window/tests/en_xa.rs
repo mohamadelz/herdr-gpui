@@ -85,7 +85,6 @@ pages! {
     #[ignore = "migrating"]
     status_bar: StatusBar, none;
     tabs: Tabs, tabs_data;
-    #[ignore = "migrating"]
     code: Code, none;
     notifications: Notifications, notifications_data;
     #[ignore = "migrating"]
